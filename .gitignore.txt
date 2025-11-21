@@ -4,5 +4,5 @@ venv/
 # Node modules
 cc-tracker-frontend/node_modules/
 
-# SQLite DB (optional if you don't want it tracked)
+# SQLite DB
 *.db
