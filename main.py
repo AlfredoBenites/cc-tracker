@@ -13,7 +13,7 @@ from fastapi import FastAPI, Depends, HTTPException
 # select = a helper to build SELECT SQL queries
 from sqlmodel import SQLModel, Field, create_engine, Session, select
 
-# So browser doesn't block requests from React and FastAPI
+# Allows React to access FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 #region card reward rules
@@ -155,10 +155,10 @@ def get_session():
 
 app = FastAPI() #FastAPI application object
 
-# This allows React to talk to FastAPI locally
+# Allows React to access FastAPI
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost5173"],
+    allow_origins=["http://localhost:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"]
