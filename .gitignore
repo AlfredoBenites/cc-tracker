@@ -1,0 +1,21 @@
+# Python venv
+venv/
+.env
+
+# Python cache
+__pycache__/
+*.pyc
+
+# SQLite DB
+*.db
+
+# VS Code
+.vscode/
+
+# Logs
+*.log
+
+# Node frontend folders (just in case)
+node_modules/
+dist/
+dist-ssr/
