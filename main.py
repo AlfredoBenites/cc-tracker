@@ -1,11 +1,9 @@
 # typing = allows for specifying the types of variables
-# Optional[int] means: this thing can be an integer OR None
 # List is used to return lists
 from typing import Optional, List
 
 # FastAPI = main class to create the API
 # Depends = a tool FastAPI uses to "inject" things to endpoints (like giving an endpoint access to a database session)
-# HTTPException = allows for the returning of clean 404 errors
 from fastapi import FastAPI, Depends, HTTPException
 
 # SQLModel = defines the tables/models
@@ -14,6 +12,9 @@ from fastapi import FastAPI, Depends, HTTPException
 # Session = a DB session (used to run queries)
 # select = a helper to build SELECT SQL queries
 from sqlmodel import SQLModel, Field, create_engine, Session, select
+
+# So browser doesn't block requests from React and FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 #region card reward rules
 # ------------------------------------ Card Reward Rules ------------------------------------
@@ -148,9 +149,20 @@ def get_session():
     with Session(engine) as session: # Creates a database session (like opening a connection)
         yield session #hands the session to FastAPI when needed
 
+#region FastAPI App
 # ------------------------------------ FastAPI App ------------------------------------
+#endregion
 
 app = FastAPI() #FastAPI application object
+
+# This allows React to talk to FastAPI locally
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
 
 @app.on_event("startup") #Called automatically when the app starts
 def on_startup():
