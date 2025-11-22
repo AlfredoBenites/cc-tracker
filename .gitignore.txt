@@ -1,8 +1,0 @@
-# Python venv
-venv/
-
-# Node modules
-cc-tracker-frontend/node_modules/
-
-# SQLite DB
-*.db
