@@ -4,7 +4,7 @@ import { useState } from "react";
 const initialForm = {
   card: "",
   amount: "",
-  who: "",
+  who: "me",
   date: "",
   category: "",
   merchant: "",
@@ -89,7 +89,19 @@ function AddTransactionPage() {
       <h1>Add Transaction</h1>
 
       <form onSubmit={handleSubmit} style={{ display: "grid", gap: "0.75rem" }}>
-        <label>
+        
+        <label style={{ display: "grid", gap: "0.25rem" }}>
+          Date
+          <input
+            type="text" // NEED TO SWITCH TO A DATE PICKER
+            name="date"
+            value={form.date}
+            onChange={handleChange}
+            placeholder="11/18/2025"
+          />
+        </label>
+        
+        <label style={{ display: "grid", gap: "0.25rem" }}>
           Card
           <input
             type="text"
@@ -100,7 +112,7 @@ function AddTransactionPage() {
           />
         </label>
 
-        <label>
+        <label style={{ display: "grid", gap: "0.25rem" }}>
           Amount
           <input
             type="number"
@@ -112,7 +124,7 @@ function AddTransactionPage() {
           />
         </label>
 
-        <label>
+        <label style={{ display: "grid", gap: "0.25rem" }}>
           Who
           <select name="who" value={form.who} onChange={handleChange}>
             <option value="me">me</option>
@@ -120,19 +132,8 @@ function AddTransactionPage() {
             <option value="dad">dad</option>
           </select>
         </label>
-        
-        <label>
-          Date
-          <input
-            type="text" // NEED TO SWITCH TO A DATE PICKER
-            name="date"
-            value={form.date}
-            onChange={handleChange}
-            placeholder="11/18/2025"
-          />
-        </label>
 
-        <label>
+        <label style={{ display: "grid", gap: "0.25rem" }}>
           Category
           <input
             type="text"
@@ -143,7 +144,7 @@ function AddTransactionPage() {
           />
         </label>
 
-        <label>
+        <label style={{ display: "grid", gap: "0.25rem" }}>
           Merchant
           <input
             type="text"
@@ -154,7 +155,7 @@ function AddTransactionPage() {
           />
         </label>
 
-        <label>
+        <label style={{ display: "grid", gap: "0.25rem" }}>
           Notes
           <input
             name="notes"
@@ -164,7 +165,7 @@ function AddTransactionPage() {
           />
         </label>
 
-        <label>
+        <label style={{ display: "grid", gap: "0.25rem" }}>
           Cashback rate (decimal)
           <input
             type="number"

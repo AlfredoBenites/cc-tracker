@@ -11,8 +11,8 @@ function App() {
     {/* Simple nav to switch pages */}
     <nav style={{ marginBottom: "1rem" }}>
       <Link to="/" style={{ marginRight: "1rem" }}>Dashboard</Link>
-      <Link to="/add">Add Transaction</Link>
-      <Link to="/transactions">Transactions</Link>
+      <Link to="/add" style={{ marginRight: "1rem" }}>Add Transaction</Link>
+      <Link to="/transactions" style={{ marginRight: "1rem" }}>Transactions</Link>
     </nav>
 
     <Routes>
