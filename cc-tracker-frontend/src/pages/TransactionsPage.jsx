@@ -75,6 +75,32 @@ function TransactionsPage() {
         setForm((prev) => ({ ...prev, [name]: checked}));
     }
 
+    async function handleDelete(id) {
+        const ok = window.confirm(`Delete transaction #${id}?`);
+        if (!ok) return;
+
+        try {
+            const res = await fetch (`http://127.0.0.1:8000/transactions/${id}`, {
+                method: "DELETE",
+            });
+            if (!res.ok) {
+                const body = await res.text();
+                console.error("Delete failed:", body);
+                alert("Failed to delete.");
+                return;
+            }
+            // remove from UI
+            setTransactions(prev => prev.filter(t => t.id !== id));
+
+            setStatusMessage("Transaction deleted");
+            setEditingTx(null);
+            setForm(emptyForm);
+        } catch (err) {
+            console.error(err);
+            alert("Network error.");
+        }
+    }
+
     async function handleUpdate(e) {
         e.preventDefault();
         if(!editingTx) return;
@@ -285,6 +311,9 @@ function TransactionsPage() {
                             </button>
                             <button type="button" onClick={cancelEdit}>
                                 Cancel
+                            </button>
+                            <button type="button" onClick={() => handleDelete(editingTx.id)}>
+                                Delete
                             </button>
                         </div>
                     </form>

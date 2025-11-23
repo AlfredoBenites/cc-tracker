@@ -45,8 +45,13 @@ function SummaryPage() {
 
           <h3>Per person</h3>
           {Object.entries(cardData.per_person || {}).map(([person, p]) => (
-            <div key={person}>  
-              <strong>{person}</strong>: total ${p.total}, paid ${p.paid}, owes ${p.owes}, cashback earned ${p.cashback_earned}, cashback pending ${p.cashback_pending}
+            <div key={person} style={{ display: "flex", gap: "1rem"}}>  
+              <strong>{person}</strong>
+                <br></br> total: ${p.total}
+                <br></br> paid: ${p.paid}
+                <br></br> owes: ${p.owes}
+                <br></br> cashback earned: ${p.cashback_earned}
+                <br></br> cashback pending: ${p.cashback_pending}
             </div>
           ))}
         </div>
