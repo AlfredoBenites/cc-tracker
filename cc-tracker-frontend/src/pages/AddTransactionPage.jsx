@@ -1,6 +1,43 @@
 import { useState } from "react";
 
-// basic starting values
+/* ---------- Config you can edit anytime ---------- */
+const PEOPLE = ["me", "mom", "dad"];
+
+const CARDS = [
+  "Chase Freedom Unlimited",
+  "Capital One Quicksilver",
+  "AMEX Blue Cash Everyday",
+  "Discover it Student Cash Back",
+  // add more…
+];
+
+const CATEGORIES = [
+  { name: "Groceries", tone: "emerald" },
+  { name: "Dining", tone: "pink" },
+  { name: "Gas", tone: "amber" },
+  { name: "Travel", tone: "sky" },
+  { name: "Drugstores", tone: "violet" },
+  { name: "Other", tone: "slate" },
+];
+
+const tones = {
+  emerald: "bg-emerald-600/20 text-emerald-200 border-emerald-600/30",
+  pink: "bg-pink-600/20 text-pink-200 border-pink-600/30",
+  amber: "bg-amber-600/20 text-amber-200 border-amber-600/30",
+  sky: "bg-sky-600/20 text-sky-200 border-sky-600/30",
+  violet: "bg-violet-600/20 text-violet-200 border-violet-600/30",
+  slate: "bg-slate-600/20 text-slate-200 border-slate-600/30",
+};
+
+/* ---------- Helpers ---------- */
+const fmtPercentInputToDecimal = (v) => {
+  if (v === "" || v === null || v === undefined) return 0;
+  const n = Number(v);
+  if (Number.isNaN(n)) return 0;
+  // allow both “3” and “0.03”
+  return n > 1 ? n / 100 : n;
+};
+
 const initialForm = {
   card: "",
   amount: "",
@@ -9,194 +46,245 @@ const initialForm = {
   category: "",
   merchant: "",
   notes: "",
-  cashback_rate: "",
+  cashback_rate_input: "", // user enters 3 for 3%
   paid: false,
 };
 
-function AddTransactionPage() {
+const inputBase =
+  "w-full rounded-lg bg-white/5 border border-white/10 px-3 py-2 outline-none " +
+  "placeholder:text-gray-400 text-sm focus:ring-2 focus:ring-emerald-500/40";
+const labelBase = "text-sm font-medium text-gray-200";
+const section = "grid gap-2";
+
+export default function AddTransactionPage() {
   const [form, setForm] = useState(initialForm);
   const [statusMessage, setStatusMessage] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // allows for the changing of values (text, number, select)
-  function handleChange(e) {
+  const onChange = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  }
-
-  function handleCheckboxChange(e) {
+    setForm((f) => ({ ...f, [name]: value }));
+  };
+  const onCheckbox = (e) => {
     const { name, checked } = e.target;
-    setForm((prev) => ({
-      ...prev,
-      [name]: checked,
-    }))
-  }
+    setForm((f) => ({ ...f, [name]: checked }));
+  };
 
-  async function handleSubmit(e) {
-    e.preventDefault(); // stops default browser attempt to refresh page so instead it can fetch the data
-    setStatusMessage(null);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     setIsSubmitting(true);
+    setStatusMessage(null);
 
-    // try function to send data
     try {
-      // convert amount and cashback_rate to numbers
       const payload = {
-        ...form,
+        date: form.date,
+        card: form.card,
         amount: parseFloat(form.amount),
-        cashback_rate: form.cashback_rate === "" ? 0 : parseFloat(form.cashback_rate),
+        who: form.who,
+        category: form.category,
+        merchant: form.merchant,
+        notes: form.notes,
+        paid: form.paid,
+        // convert % string to decimal for backend
+        cashback_rate: fmtPercentInputToDecimal(form.cashback_rate_input),
       };
 
-      // makes sure a number is sent
-      if (isNaN(payload.amount)) {
+      if (Number.isNaN(payload.amount)) {
         setStatusMessage("Amount must be a number.");
         setIsSubmitting(false);
         return;
       }
 
-      // sending data
-      const res = await fetch("http://127.0.0.1:8000/transactions", {
+      const base = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+      const res = await fetch(`${base}/transactions`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
-      // if there's an error or not in sending data display it
-      if(!res.ok) {
-        const errorBody = await res.text();
-        console.error("Backend error:", errorBody);
+      if (!res.ok) {
+        const t = await res.text();
+        console.error(t);
         setStatusMessage("Error: failed to save transaction.");
       } else {
-        const data = await res.json();
-        console.log("Created transaction:", data);
-        setStatusMessage("Transaction saved.");
-        setForm(initialForm); // clears form
+        setStatusMessage("✅ Transaction saved.");
+        setForm(initialForm);
       }
     } catch (err) {
-      console.error("Request error:", err);
+      console.error(err);
       setStatusMessage("Network error while saving.");
     } finally {
       setIsSubmitting(false);
     }
-  }
+  };
+
+  const selectedCat = CATEGORIES.find((c) => c.name === form.category);
 
   return (
-    <div style={{ maxWidth: "600px", margin: "0 auto" }}>
-      <h1>Add Transaction</h1>
+    <div className="max-w-xl mx-auto">
+      <h1 className="text-3xl font-bold tracking-tight mb-4">Add Transaction</h1>
 
-      <form onSubmit={handleSubmit} style={{ display: "grid", gap: "0.75rem" }}>
-        
-        <label style={{ display: "grid", gap: "0.25rem" }}>
-          Date
-          <input
-            type="text" // NEED TO SWITCH TO A DATE PICKER
-            name="date"
-            value={form.date}
-            onChange={handleChange}
-            placeholder="11/18/2025"
-          />
-        </label>
-        
-        <label style={{ display: "grid", gap: "0.25rem" }}>
-          Card
-          <input
-            type="text"
-            name="card"
-            value={form.card}
-            onChange={handleChange}
-            placeholder="Capital One Quicksilver, etc."
-          />
-        </label>
+      <form onSubmit={handleSubmit} className="grid gap-4">
+        {/* Date */}
+        <div className={section}>
+          <label className={labelBase}>Date</label>
+          <input type="date" name="date" value={form.date} onChange={onChange} className={inputBase} />
+        </div>
 
-        <label style={{ display: "grid", gap: "0.25rem" }}>
-          Amount
-          <input
-            type="number"
-            step="0.01"
-            name="amount"
-            value={form.amount}
-            onChange={handleChange}
-            placeholder="22.23"
-          />
-        </label>
+        {/* Card (dropdown from list) */}
+        <div className={section}>
+          <label className={labelBase}>Card</label>
+          <div className="relative">
+            <select
+              name="card"
+              value={form.card}
+              onChange={onChange}
+              className={`${inputBase} appearance-none pr-9`}
+            >
+              <option value="" disabled>Choose a card…</option>
+              {CARDS.map((c) => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
+            <Chevron />
+          </div>
+        </div>
 
-        <label style={{ display: "grid", gap: "0.25rem" }}>
-          Who
-          <select name="who" value={form.who} onChange={handleChange}>
-            <option value="me">me</option>
-            <option value="mom">mom</option>
-            <option value="dad">dad</option>
-          </select>
-        </label>
+        {/* Amount + Who */}
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className={section}>
+            <label className={labelBase}>Amount</label>
+            <input
+              type="number"
+              step="0.01"
+              inputMode="decimal"
+              name="amount"
+              value={form.amount}
+              onChange={onChange}
+              placeholder="22.23"
+              className={inputBase}
+            />
+          </div>
 
-        <label style={{ display: "grid", gap: "0.25rem" }}>
-          Category
-          <input
-            type="text"
-            name="category"
-            value={form.category}
-            onChange={handleChange}
-            placeholder="Gas, Dining, Groceries..."
-          />
-        </label>
+          <div className={section}>
+            <label className={labelBase}>Who</label>
+            <div className="relative">
+              <select
+                name="who"
+                value={form.who}
+                onChange={onChange}
+                className={`${inputBase} appearance-none pr-9`}
+              >
+                {PEOPLE.map((p) => (
+                  <option key={p} value={p}>{p}</option>
+                ))}
+              </select>
+              <Chevron />
+            </div>
+          </div>
+        </div>
 
-        <label style={{ display: "grid", gap: "0.25rem" }}>
-          Merchant
+        {/* Category (dropdown) */}
+        <div className={section}>
+          <label className={labelBase}>Category</label>
+          <div className="relative">
+            <select
+              name="category"
+              value={form.category}
+              onChange={onChange}
+              className={`${inputBase} appearance-none pr-9`}
+            >
+              <option value="" disabled>Choose a category…</option>
+              {CATEGORIES.map((c) => (
+                <option key={c.name} value={c.name}>{c.name}</option>
+              ))}
+            </select>
+            <Chevron />
+          </div>
+          {/* show a colored pill for the picked category */}
+          {selectedCat && (
+            <span className={`inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs border w-fit ${tones[selectedCat.tone]}`}>
+              {selectedCat.name}
+            </span>
+          )}
+        </div>
+
+        {/* Merchant */}
+        <div className={section}>
+          <label className={labelBase}>Merchant</label>
           <input
             type="text"
             name="merchant"
             value={form.merchant}
-            onChange={handleChange}
-            placeholder="Amazon, Walmart, Fresco Y Mas..."
+            onChange={onChange}
+            placeholder="Amazon, Walmart, Fresco y Más…"
+            className={inputBase}
           />
-        </label>
+        </div>
 
-        <label style={{ display: "grid", gap: "0.25rem" }}>
-          Notes
+        {/* Notes */}
+        <div className={section}>
+          <label className={labelBase}>Notes</label>
           <input
             name="notes"
             value={form.notes}
-            onChange={handleChange}
+            onChange={onChange}
             placeholder="Christmas gifts, gas for my truck, etc."
+            className={inputBase}
           />
-        </label>
+        </div>
 
-        <label style={{ display: "grid", gap: "0.25rem" }}>
-          Cashback rate (decimal)
-          <input
-            type="number"
-            step="0.001"
-            name="cashback_rate"
-            value={form.cashback_rate}
-            onChange={handleChange}
-            placeholder="0.03 for 3%"
-          />
-        </label>
+        {/* Cashback input as PERCENT */}
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className={section}>
+            <label className={labelBase}>Cashback (%)</label>
+            <input
+              type="number"
+              step="0.1"
+              inputMode="decimal"
+              name="cashback_rate_input"
+              value={form.cashback_rate_input}
+              onChange={onChange}
+              placeholder="e.g., 3 for 3%"
+              className={inputBase}
+            />
+          </div>
 
-        <label style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-          <input
-            type="checkbox"
-            name="paid"
-            checked={form.paid}
-            onChange={handleCheckboxChange}
-          />
-          Mark as paid
-        </label>
+          <label className="flex items-center gap-3 pt-6">
+            <input
+              type="checkbox"
+              name="paid"
+              checked={form.paid}
+              onChange={onCheckbox}
+              className="h-4 w-4 accent-emerald-500"
+            />
+            <span className="text-sm text-gray-200">Mark as paid</span>
+          </label>
+        </div>
 
-        <button type="submit" disabled={isSubmitting}>
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className={`inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium
+            ${isSubmitting ? "bg-emerald-600/50 text-white cursor-not-allowed" : "bg-emerald-600 hover:bg-emerald-500 text-white"} transition`}
+        >
           {isSubmitting ? "Saving..." : "Save Transaction"}
         </button>
       </form>
 
-      {statusMessage && (
-        <p style={{ marginTop: "1rem" }}>{statusMessage}</p>
-      )}
+      {statusMessage && <p className="mt-4 text-sm text-gray-200">{statusMessage}</p>}
     </div>
   );
 }
 
-export default AddTransactionPage;
+/* small chevron for custom select */
+function Chevron() {
+  return (
+    <svg
+      className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-300"
+      viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"
+    >
+      <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clipRule="evenodd" />
+    </svg>
+  );
+}
