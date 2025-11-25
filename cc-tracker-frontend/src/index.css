@@ -3,3 +3,25 @@
 body {
     @apply bg-gray-900 text-white;
 }
+
+/* Fix Windows dropdown options (dark mode) */
+select option {
+  background-color: #1a1f2c; /* same as dark background */
+  color: #e5e7eb; /* gray-200 text */
+}
+
+select:focus option {
+  background-color: #1a1f2c;
+  color: #e5e7eb;
+}
+
+/* Remove default calendar icon on Chrome, Edge, Opera */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  display: none;
+}
+
+/* Remove background icon on Firefox */
+input[type="date"] {
+  background-image: none !important;
+}

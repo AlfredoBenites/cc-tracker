@@ -125,30 +125,40 @@ export default function AddTransactionPage() {
       <h1 className="text-3xl font-bold tracking-tight mb-4">Add Transaction</h1>
 
       <form onSubmit={handleSubmit} className="grid gap-4">
-        {/* Date */}
-        <div className={section}>
+          {/* Date */}
+          <div className={section}>
           <label className={labelBase}>Date</label>
-          <input type="date" name="date" value={form.date} onChange={onChange} className={inputBase} />
-        </div>
 
-        {/* Card (dropdown from list) */}
-        <div className={section}>
-          <label className={labelBase}>Card</label>
           <div className="relative">
-            <select
-              name="card"
-              value={form.card}
+            <input
+              type="date"
+              name="date"
+              value={form.date}
               onChange={onChange}
-              className={`${inputBase} appearance-none pr-9`}
+              className={`${inputBase} pr-12`} // extra space for big icon
+            />
+
+            {/* Custom clickable icon */}
+            <div
+              onClick={() => document.querySelector('input[name="date"]').showPicker?.()}
+              className="absolute right-3 top-1/2 -translate-y-1/2
+                        bg-white/10 hover:bg-white/20 cursor-pointer
+                        p-2 rounded-md transition"
             >
-              <option value="" disabled>Choose a card…</option>
-              {CARDS.map((c) => (
-                <option key={c} value={c}>{c}</option>
-              ))}
-            </select>
-            <Chevron />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4 text-gray-300"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
           </div>
         </div>
+
 
         {/* Amount + Who */}
         <div className="grid gap-4 md:grid-cols-2">
