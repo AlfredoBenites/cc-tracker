@@ -107,22 +107,12 @@ CC-Tracker is a full-stack application that helps users track shared credit card
 <!-- CONTACT -->
 ## Contact
 
-Your Name - [@twitter_handle](https://twitter.com/twitter_handle) - email@email_client.com
+Alfredo Benites -  - benitesaalfredo@gmail.com
 
 Project Link: [https://github.com/AlfredoBenites/cc-tracker](https://github.com/AlfredoBenites/cc-tracker)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
-
-<!-- ACKNOWLEDGMENTS -->
-## Acknowledgments
-
-* []()
-* []()
-* []()
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 
