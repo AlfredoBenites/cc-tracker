@@ -76,6 +76,10 @@
 ## About The Project
 
 <img width="1308" height="726" alt="image" src="https://github.com/user-attachments/assets/cce82a03-2eb0-40ee-8bf6-fe10722fa765" />
+<img width="1297" height="737" alt="image" src="https://github.com/user-attachments/assets/18610df7-bc7b-46be-96c7-92e11ce9d8ef" />
+<img width="1335" height="845" alt="image" src="https://github.com/user-attachments/assets/906818bd-fec4-4f55-9657-77dc95a4b513" />
+
+
 
 
 CC-Tracker is a full-stack application that helps users track shared credit card spending between family members and friends. It replaces messy spreadsheets with a clean dashboard showing totals, who owes what, cashback earned, and detailed transaction logs, all powered by a FastAPI backend and a responsive React/Tailwind UI.
@@ -86,13 +90,38 @@ CC-Tracker is a full-stack application that helps users track shared credit card
 
 ### Built With
 
+* [![Python][Python.org]][Python-url]
+* [![JavaScript][JavaScript.js]][JavaScript-url]
 * [![React][React.js]][React-url]
-* [![JavaScript][JavaScript-logo]][JavaScript-url]
-* [![Python][Python-logo]][Python-url]
-* [![Tailwind CSS][TailwindCSS-logo]][TailwindCSS-url]
+* [![Tailwind CSS][TailwindCSS.com]][TailwindCSS-url]
+* [![SQLite][SQLite.org]][SQLite-url]
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p
+
+<!-- ROADMAP -->
+## Roadmap (Future Improvements)
+
+- [ ] Monthly statements
+- [ ] Upgrade the database structure to securely save and separate data for every user.
+- [ ] Spending graphs (bar/pie charts)
+- [ ] Auto-cashback rules per card
+- [ ] Auto-category detection via merchant mapping
+- [ ] Export transactions to CSV Authentication (JWT)
+- [ ] Full deployment (Vercel + Render)
+- [ ] Mobile version (React Native or Flutter)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+## What I Learned
+This project helped me learn how to:
+- Build and document a REST API
+- Design a database schema and compute aggregate metrics
+- Use SQLModel to manage relational data
+- Build reusable components with React Implement clean state management with hooks
+- Build modern UI layouts with Tailwind Transform spreadsheet logic into clean backend code
+- Create UX patterns similar to real finance apps (Copilot, Mint, Monarch)
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 ### Top contributors:
@@ -148,3 +177,11 @@ Project Link: [https://github.com/AlfredoBenites/cc-tracker](https://github.com/
 [Bootstrap-url]: https://getbootstrap.com
 [JQuery.com]: https://img.shields.io/badge/jQuery-0769AD?style=for-the-badge&logo=jquery&logoColor=white
 [JQuery-url]: https://jquery.com 
+[Python.org]: https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=fff
+[Python-url]: https://www.python.org/
+[Javascript.js]: https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=000
+[Javascript-url]: https://developer.mozilla.org/en-US/docs/Web/JavaScript
+[TailwindCSS.com]: https://img.shields.io/badge/Tailwind%20CSS-%2338B2AC.svg?logo=tailwind-css&logoColor=white
+[TailwindCSS-url]: https://tailwindcss.com/
+[SQLite.org]: https://img.shields.io/badge/SQLite-%2307405e.svg?logo=sqlite&logoColor=white
+[SQLite-url]: https://sqlite.org/
