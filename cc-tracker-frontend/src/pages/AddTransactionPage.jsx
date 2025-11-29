@@ -17,6 +17,12 @@ const CATEGORIES = [
   { name: "Gas", tone: "amber" },
   { name: "Travel", tone: "sky" },
   { name: "Drugstores", tone: "violet" },
+  { name: "Online Shopping", tone: "purple" },
+  { name: "Public Transit", tone: "fuchsia" },
+  { name: "Utilities", tone: "lime" },
+  { name: "Entertainment", tone: "yellow" },
+  { name: "Amazon", tone: "red" },
+  { name: "Rent", tone: "sky" },
   { name: "Other", tone: "slate" },
 ];
 
