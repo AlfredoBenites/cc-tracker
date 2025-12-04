@@ -1,8 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 /* ---------- Config you can edit anytime ---------- */
-const PEOPLE = ["me", "mom", "dad"];
-
 const CARDS = [
   "Chase Freedom Unlimited",
   "Capital One Quicksilver",
@@ -21,7 +19,7 @@ const CATEGORIES = [
   { name: "Public Transit", tone: "fuchsia" },
   { name: "Utilities", tone: "lime" },
   { name: "Entertainment", tone: "yellow" },
-  { name: "Amazon", tone: "red" },
+  { name: "Amazon", tone: "rose" },
   { name: "Rent", tone: "sky" },
   { name: "Other", tone: "slate" },
 ];
@@ -35,6 +33,8 @@ const tones = {
   slate: "bg-slate-600/20 text-slate-200 border-slate-600/30",
 };
 
+const base = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+
 /* ---------- Helpers ---------- */
 const fmtPercentInputToDecimal = (v) => {
   if (v === "" || v === null || v === undefined) return 0;
@@ -47,7 +47,7 @@ const fmtPercentInputToDecimal = (v) => {
 const initialForm = {
   card: "",
   amount: "",
-  who: "me",
+  who: "",
   date: "",
   category: "",
   merchant: "",
@@ -61,14 +61,67 @@ const inputBase =
   "placeholder:text-gray-400 text-sm focus:ring-2 focus:ring-emerald-500/40";
 const labelBase = "text-sm font-medium text-gray-200";
 const section = "grid gap-2";
+const makeInitialForm = (who = "") => ({ ...initialForm, who });
 
 export default function AddTransactionPage() {
   const [form, setForm] = useState(initialForm);
+  const [people, setPeople] = useState(["me", "mom", "dad"]);
+  const [loadingPeople, setLoadingPeople] = useState(true);
   const [statusMessage, setStatusMessage] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch(`${base}/people`);
+        if (res.ok) {
+          const data = await res.json();
+          const names = data.map((p) => p.name).filter(Boolean);
+          if (names.length) setPeople(names);
+        }
+      } catch (e) {
+        console.error("Failed to load people", e);
+      } finally {
+        setLoadingPeople(false);
+      }
+    })();
+  }, []);
+
+  const addPerson = async () => {
+    const name = prompt("Add person");
+    const trimmed = name?.trim();
+    if (!trimmed) return;
+    if (people.includes(trimmed)) {
+      setForm((f) => ({ ...f, who: trimmed }));
+      return;
+    }
+    try {
+      const res = await fetch(`${base}/people`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: trimmed }),
+      });
+      if (!res.ok) {
+        const text = await res.text();
+        console.error(text);
+        setStatusMessage("Failed to add person.");
+        return;
+      }
+      const created = await res.json();
+      setPeople((p) => [...p, created.name]);
+      setForm((f) => ({ ...f, who: created.name }));
+    } catch (err) {
+      console.error(err);
+      setStatusMessage("Network error adding person.");
+    }
+  };
+
   const onChange = (e) => {
     const { name, value } = e.target;
+    if (name === "who" && value === "__add_person") {
+      addPerson();
+      return;
+    }
     setForm((f) => ({ ...f, [name]: value }));
   };
   const onCheckbox = (e) => {
@@ -114,7 +167,7 @@ export default function AddTransactionPage() {
         setStatusMessage("Error: failed to save transaction.");
       } else {
         setStatusMessage("✅ Transaction saved.");
-        setForm(initialForm);
+        setForm(makeInitialForm(""));
       }
     } catch (err) {
       console.error(err);
@@ -165,6 +218,24 @@ export default function AddTransactionPage() {
           </div>
         </div>
 
+        {/* Card (dropdown) */}
+        <div className={section}>
+          <label className={labelBase}>Card</label>
+          <div className="relative">
+            <select
+              name="card"
+              value={form.card}
+              onChange={onChange}
+              className={`${inputBase} appearance-none pr-9`}
+            >
+              <option value="" disabled>Choose a card…</option>
+              {CARDS.map((c) => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
+            <Chevron />
+          </div>
+        </div>
 
         {/* Amount + Who */}
         <div className="grid gap-4 md:grid-cols-2">
@@ -182,6 +253,7 @@ export default function AddTransactionPage() {
             />
           </div>
 
+
           <div className={section}>
             <label className={labelBase}>Who</label>
             <div className="relative">
@@ -190,10 +262,13 @@ export default function AddTransactionPage() {
                 value={form.who}
                 onChange={onChange}
                 className={`${inputBase} appearance-none pr-9`}
+                disabled={loadingPeople}
               >
-                {PEOPLE.map((p) => (
+                <option value="" disabled>Choose who made the purchase...</option>
+                {people.map((p) => (
                   <option key={p} value={p}>{p}</option>
                 ))}
+                <option value="__add_person">Add person...</option>
               </select>
               <Chevron />
             </div>

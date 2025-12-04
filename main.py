@@ -112,6 +112,11 @@ class Transaction(SQLModel, table=True):
     paid: bool = False
     cashback_rate: float = 0.0
 
+# Simple people table so users can manage who is available for transactions
+class Person(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    name: str = Field(index=True, unique=True)
+
 # This model defines the data the client sends when creating a new transaction
 # It does not inclue "id" because the database creates that
 class TransactionCreate(SQLModel):
@@ -126,6 +131,9 @@ class TransactionCreate(SQLModel):
     paid: bool = False
     cashback_rate: float = 0.0
 
+class PersonCreate(SQLModel):
+    name: str
+
 # This model defines the data for updating an existing transaction
 # All fields are optional so that you can just send what you want to change
 class TransactionUpdate(SQLModel):
@@ -139,6 +147,9 @@ class TransactionUpdate(SQLModel):
     who: Optional[str] = None
     paid: Optional[bool] = None
     cashback_rate: Optional[float] = None
+
+class PersonUpdate(SQLModel):
+    name: Optional[str] = None
 #endregion
 
 def create_db_and_tables():
@@ -171,6 +182,47 @@ def on_startup():
 @app.get("/") # Visiting http://localhost:8000/ shows this JSON
 def read_root():
     return {"message": "Credit Card Tracker v1 is alive"}
+
+@app.get("/people", response_model=List[Person])
+def list_people(session: Session = Depends(get_session)):
+    return session.exec(select(Person)).all()
+
+@app.post("/people", response_model=Person)
+def create_person(person: PersonCreate, session: Session = Depends(get_session)):
+    existing = session.exec(select(Person).where(Person.name == person.name)).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="Person already exists")
+    p = Person.from_orm(person)
+    session.add(p)
+    session.commit()
+    session.refresh(p)
+    return p
+
+@app.patch("/people/{person_id}", response_model=Person)
+def update_person(person_id: int, person_update: PersonUpdate, session: Session = Depends(get_session)):
+    p = session.get(Person, person_id)
+    if not p:
+        raise HTTPException(status_code=404, detail="Person not found")
+    data = person_update.dict(exclude_unset=True)
+    if "name" in data:
+        existing = session.exec(select(Person).where(Person.name == data["name"])).first()
+        if existing and existing.id != person_id:
+            raise HTTPException(status_code=400, detail="Person already exists")
+    for key, value in data.items():
+        setattr(p, key, value)
+    session.add(p)
+    session.commit()
+    session.refresh(p)
+    return p
+
+@app.delete("/people/{person_id}")
+def delete_person(person_id: int, session: Session = Depends(get_session)):
+    p = session.get(Person, person_id)
+    if not p:
+        raise HTTPException(status_code=404, detail="Person not found")
+    session.delete(p)
+    session.commit()
+    return {"status": "deleted", "id": person_id}
 
 #region show all transactions
 @app.get("/transactions")
